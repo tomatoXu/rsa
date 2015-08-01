@@ -20,10 +20,10 @@ int main(int argc, char **argv)
         rsa_context ctx;
         rsa_pubkey pub_key;
         rsa_crt_prikey pri_key;
-        unsigned char *plain = "";
-        unsigned char *cipher = "";
-        unsigned char *pubkey = "";
-        unsigned char *privkey = "";
+        unsigned char plain[256];
+        unsigned char cipher[256];
+        unsigned char pubkey[256];
+        unsigned char privkey[256];
         mpi n,e,d;
         int opt = 0;
         while ((opt = getopt_long(argc, argv, "p:k:hv", opts, NULL)) != -1) {
@@ -67,10 +67,9 @@ int main(int argc, char **argv)
         memset(output,0,sizeof(output));
         memset(finput,0,sizeof(finput));
         int i=0;
-//	strcpy(input,"wangweihua11234567889");
         
-        mpi_read_string(&ctx.N, pubkey, sizeof(pubkey)/8);
-        mpi_read_string(&ctx.E, (unsigned char*)"\x00\x01\x00\x01", 4);
+      //  mpi_read_binary(pub_key->N, pubkey, sizeof(pubkey)/8);
+     //   mpi_read_binary(&ctx.E, (unsigned char*)"\x00\x01\x00\x01",4);
                 
         //RSA_Generate_keys(&pub_key,&pri_key);
 /*	for(i=0; i<256; i++)
@@ -79,8 +78,9 @@ int main(int argc, char **argv)
 		printf("%x ", pub_key.N[i]);
 		if((i+1)%16==0) printf("\n");
 	}*/
+        printf("xxxxxxxx");
         printf("plain:%s\n",plain);
-
+        printf("pub_key.N:%s\n",pubkey);
         RSA_Encrypt(&pub_key,plain,output);
         printf("\n");
         
@@ -89,13 +89,13 @@ int main(int argc, char **argv)
 		printf("%x ", output[i]);
 		if((i+1)%32==0) printf("\n");
       	}
-	RSA_Decrypt(&pri_key,output,finput);
+/*	RSA_Decrypt(&pri_key,output,finput);
         printf("\n");
 	for(i=0; i<21; i++)
 	{
 		printf("%c ", finput[i]);
 		if((i+1)%32==0) printf("\n");
-	}
+	}*/
 	printf("\n");
         return 0;
 }
