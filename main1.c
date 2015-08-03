@@ -129,17 +129,15 @@ int main(int argc, char **argv)
                 }
         }
         
-      //  mpi_read_binary(pub_key->N, pubkey, sizeof(pubkey)/8);
-     //   mpi_read_binary(&ctx.E, (unsigned char*)"\x00\x01\x00\x01",4);
-        char *o = "ac";
+       /* char *o = "ac";
         unsigned char y=f(o);
         printf("0x%02x\n",y);
 
-
+*/
         RSA_Generate_keys(&pub_key,&pri_key);
 	for(i=0; i<256; i++)
 	{
-                pub_key.N[i] = (unsigned char)pubkey[i];
+        pub_key.N[i] = pubkey[i];
 		printf("%02x ", pub_key.N[i]);
 		if((i+1)%16==0) printf("\n");
 	}
