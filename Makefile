@@ -1,3 +1,3 @@
 all:
-	gcc -g bignum.c  main1.c  rsa.c -o rsa
+	gcc -g bignum.c  main.c  rsa.c -o rsa
 
