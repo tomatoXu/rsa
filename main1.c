@@ -23,10 +23,10 @@ typedef union{
 }KEY;
 */
 
-unsigned long f(char str[2])
+unsigned char c_to_uc(char* str)
 {
-        unsigned long var = 0;
-        unsigned long t;
+        unsigned char var = 0;
+        unsigned char t;
         int len = strlen(str);
         if (var > 8)
                 return -1;
@@ -35,7 +35,8 @@ unsigned long f(char str[2])
                 str[0]-='a'-'A';
         if(str[1]>='a'&&str[1]<='z')
                 str[1]-='a'-'A';
-        for (;*str;str++){
+        int i = 0;
+        for (;i<2;str++,i++){
                 if (*str >= 'A'&&*str <='F')
                         t = *str-55;
                 else
@@ -81,7 +82,7 @@ int main(int argc, char **argv)
                                 char tmp[2];
                                 tmp[0] = temp[2*i];
                                 tmp[1] = temp[2*i+1];
-                                pubkey[i] = f(tmp);
+                                pubkey[i] = c_to_uc(tmp);
                         }
                         //printf("len:%d\n",strlen(pubkey));
                         break;
