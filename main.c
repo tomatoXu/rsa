@@ -5,6 +5,12 @@
 #include "rsa.h"
 
 #define BUFSIZE 1024
+		int op;
+		char temp[512];
+        unsigned char plain[256];
+        unsigned char cipher[256]; 
+        unsigned char output[128];
+        unsigned char de_mes[128];
 
 struct option opts[] = {
         {"plain", required_argument, NULL, 'p'},
@@ -40,9 +46,10 @@ unsigned char c_to_uc(char* str)
         return var;
 }
 
-void key_gen( rsa_pubkey pub_key, rsa_crt_prikey pri_key){
-		int i;
-		RSA_Generate_keys(&pub_key, &pri_key);
+void key_gen( rsa_pubkey pub_key, rsa_crt_prikey pri_key)
+{
+	int i;
+	RSA_Generate_keys(&pub_key, &pri_key);
         printf("the pubkey is:\n");
         for (i = 0; i < 128; i++){
                 printf("%02x", pub_key.N[i]);
@@ -58,9 +65,10 @@ void key_gen( rsa_pubkey pub_key, rsa_crt_prikey pri_key){
         printf("\n");
 }
 
-void get_cipher(char* temp, unsigned char* cipher){
-		int i;
-		memcpy(temp, optarg, 512);
+void get_cipher(char* temp, unsigned char* cipher)
+{
+	int i;
+	memcpy(temp, optarg, 512);
         for(i=0; i<strlen(temp); i++){
                 if (temp[2*i] == '\0' || temp[2*i+1] == '\0') break;
                 char tmp[2];
@@ -69,23 +77,23 @@ void get_cipher(char* temp, unsigned char* cipher){
                 cipher[i] = c_to_uc(tmp);
         }
 }
-void encrypt(char* temp,unsigned char* plain, rsa_pubkey pub_key, rsa_crt_prikey pri_key, unsigned char* output){
-		unsigned char pubkey[256];
-		memset(pubkey, 0, sizeof(pubkey));
-		int i;
-		memcpy(temp, optarg, 512);
+void encrypt(char* temp,unsigned char* plain, rsa_pubkey pub_key, rsa_crt_prikey pri_key, unsigned char* output)
+{
+	unsigned char pubkey[256];
+	memset(pubkey, 0, sizeof(pubkey));
+	int i;
         for(i=0; i<strlen(temp); i++){
-				if (temp[2*i] == '\0' || temp[2*i+1] == '\0') break;
+		if (temp[2*i] == '\0' || temp[2*i+1] == '\0') break;
                 char tmp[2];
                 tmp[0] = temp[2*i];
-				tmp[1] = temp[2*i+1];
+		tmp[1] = temp[2*i+1];
                 pubkey[i] = c_to_uc(tmp);
         }
         RSA_Generate_keys(&pub_key,&pri_key);
         for(i=0; i<256; i++){
                 // pub_key.N[i] = pubkey[i];
                 printf("%02x ", pub_key.N[i]);
-				if ((i+1)%16 == 0) printf("\n");
+		if ((i+1)%16 == 0) printf("\n");
         }
         printf("\nplain:%s\n", plain);
         RSA_Encrypt(&pub_key, plain, output);
@@ -96,43 +104,44 @@ void encrypt(char* temp,unsigned char* plain, rsa_pubkey pub_key, rsa_crt_prikey
         }
         printf("\n");	
 }
-void decrypt(char* temp,unsigned char* cipher, rsa_pubkey pub_key, rsa_crt_prikey pri_key, unsigned char* de_mes){
-		unsigned char priv_p[256];
+void decrypt(char* temp,unsigned char* cipher, rsa_pubkey pub_key, rsa_crt_prikey pri_key, unsigned char* de_mes)
+{
+	unsigned char priv_p[256];
         unsigned char priv_q[256];
         memset(priv_p, 0, sizeof(priv_p));
         memset(priv_q, 0, sizeof(priv_q));
-		int i;
-		for(i=0; i<strlen(temp); i++){
+	int i;
+	for(i=0; i<strlen(temp); i++){
                 if (temp[2*i] == '+' || temp[2*i+1] == '+') break;
                 char tmp[2];
                 tmp[0] = temp[2*i];
                 tmp[1] = temp[2*i+1];priv_p[i] = c_to_uc(tmp);
-		}
+	}
         i++;
-		int a = i;
+	int a = i;
         for(i; i<strlen(temp); i++){
-				if (temp[2*i] == '\0' || temp[2*i+1] == '\0') break;
+		if (temp[2*i] == '\0' || temp[2*i+1] == '\0') break;
                 char tmp[2];
                 tmp[0] = temp[2*i];
-				tmp[1] = temp[2*i+1];
+		tmp[1] = temp[2*i+1];
                 priv_q[i-a] = c_to_uc(tmp);
         }
         printf("the cipher is :\n");
 		for(i=0; i<strlen(cipher)-1; i++){
-				printf("%02x ", cipher[i]);
+		printf("%02x ", cipher[i]);
                 if ((i+1)%16 == 0) printf("\n");
 		}
         RSA_Generate_keys(&pub_key, &pri_key);
         printf("\np:\n");
         for(i=0; i<128; i++){
-				pri_key.P[i] = priv_p[i];
+		pri_key.P[i] = priv_p[i];
                 printf("%02x ", pri_key.P[i]);
                 if((i+1)%16 == 0) printf("\n");
         }
         printf("\nq:\n");
         for(i=0; i<128; i++){
                 pri_key.Q[i] = priv_q[i];
-				printf("%02x ", pri_key.Q[i]);
+		printf("%02x ", pri_key.Q[i]);
                 if((i+1)%16 == 0) printf("\n");
         }
         RSA_Decrypt(&pri_key, cipher, de_mes);
@@ -144,22 +153,6 @@ void decrypt(char* temp,unsigned char* cipher, rsa_pubkey pub_key, rsa_crt_prike
 }
 int getoptions(int argc, char **argv)
 {
-        rsa_context ctx;
-        rsa_pubkey pub_key;
-        rsa_crt_prikey pri_key;
-		char temp[512];
-        unsigned char plain[256];
-        unsigned char cipher[256]; 
-        unsigned char output[128];
-        unsigned char de_mes[128];
-        memset(temp, 0, sizeof(temp));
-        memset(plain, 0, sizeof(plain));
-		memset(cipher, 0, sizeof(cipher));
-        memset(output, 0, sizeof(output));
-        memset(de_mes, 0, sizeof(de_mes));
-        srand((unsigned)time(NULL));
-        int i = 0;
-        int j = 0;
         int opt = 0;
         while ((opt = getopt_long(argc, argv, "p:c:b:i:ghv", opts, NULL)) != -1) {
                 switch (opt) {
@@ -167,19 +160,19 @@ int getoptions(int argc, char **argv)
                         strncpy(plain, optarg, sizeof(plain));
                         break;
                 case 'c':
-						memcpy(temp, optarg, 512);
+			memcpy(temp, optarg, 512);
                         get_cipher(temp, cipher);
                         break;
                 case 'b':
-						memcpy(temp, optarg, 512);
-                        encrypt(temp, plain, pub_key, pri_key, output);
+			op = 1;
+			memcpy(temp, optarg, 512);
                         break;
                 case 'i':
+			op = 2;
                         memcpy(temp, optarg, 512);
-                        decrypt(temp, cipher, pub_key, pri_key, de_mes);
                         break;
                 case 'g':
-                        key_gen(pub_key, pri_key);
+			op = 0;
                         break;
                 case 'v':
                         printf("version 1.0.0\n");
@@ -205,6 +198,23 @@ int getoptions(int argc, char **argv)
         return 0;
 }
 int main(int argc,char **argv){
-		int ret = getoptions(argc, argv);
-		return ret;
+        rsa_context ctx;
+        rsa_pubkey pub_key;
+        rsa_crt_prikey pri_key;
+        srand((unsigned)time(NULL));
+	int ret = getoptions(argc, argv);
+	switch (op){
+	case 0:
+		key_gen(pub_key, pri_key);
+		break;
+	case 1:
+		encrypt(temp, plain, pub_key, pri_key, output);
+		break;
+	case 2:
+		decrypt(temp, cipher, pub_key, pri_key, de_mes);
+		break;
+	default:
+		return -1;
+	}
+	return ret;
 }
