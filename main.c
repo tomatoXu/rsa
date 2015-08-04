@@ -10,6 +10,7 @@ struct option opts[] = {
         {"cipher", required_argument, NULL, 'c'},
         {"pub", required_argument, NULL, 'b'},
         {"pri", required_argument, NULL, 'i'},
+        {"gen", no_argument, NULL, 'g'},
         {"help", no_argument, NULL, 'h'},
         {"version", no_argument, NULL, 'v'}
 };
@@ -59,7 +60,7 @@ int main(int argc, char **argv)
         memset(de_mes, 0, sizeof(de_mes));
         int i = 0;
         int opt = 0;
-        while ((opt = getopt_long(argc, argv, "p:c:b:i:hv", opts, NULL)) != -1) {
+        while ((opt = getopt_long(argc, argv, "p:c:b:i:ghv", opts, NULL)) != -1) {
                 switch (opt) {
                 case 'p':
                         strncpy(plain, optarg, sizeof(plain));
@@ -153,6 +154,24 @@ int main(int argc, char **argv)
                                 printf("%c ", de_mes[i]);
                         }
                         printf("\n");
+                        break;
+                case 'g':
+                        RSA_Generate_keys(&pub_key, &pri_key);
+                        printf("the pubkey.N is:\n");
+                        for (i=0; i < 128; i++){
+                                printf("%02x ", pub_key.N[i]);
+                                if((i+1)%16 == 0) printf("\n");
+                        }
+                        printf("\nthe prikey.P is:\n");
+                        for (i=0; i < 64; i++){
+                                printf("%02x ",pri_key.P[i]);
+                                if((i+1)%16 == 0) printf("\n");
+                        }
+                        printf("\nthe prikey.Q is:\n");
+                        for (i=0; i < 64; i++){
+                                printf("%02x ",pri_key.Q[i]);
+                                if((i+1)%16 == 0) printf("\n");
+                        }
                         break;
                 case 'v':
                         printf("version 1.0.0\n");
