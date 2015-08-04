@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <getopt.h>
+#include <time.h>
 #include "rsa.h"
 
 #define BUFSIZE 1024
@@ -58,7 +59,9 @@ int main(int argc, char **argv)
         memset(priv_q, 0, sizeof(priv_q));
         memset(output, 0, sizeof(output));
         memset(de_mes, 0, sizeof(de_mes));
+        srand((unsigned)time(NULL));
         int i = 0;
+        int j = 0;
         int opt = 0;
         while ((opt = getopt_long(argc, argv, "p:c:b:i:ghv", opts, NULL)) != -1) {
                 switch (opt) {
@@ -157,21 +160,19 @@ int main(int argc, char **argv)
                         break;
                 case 'g':
                         RSA_Generate_keys(&pub_key, &pri_key);
-                        printf("the pubkey.N is:\n");
-                        for (i=0; i < 128; i++){
-                                printf("%02x ", pub_key.N[i]);
-                                if((i+1)%16 == 0) printf("\n");
+                        printf("the pubkey is:\n");
+                        for (i = 0; i < 128; i++){
+                                printf("%02x", pub_key.N[i]);
                         }
-                        printf("\nthe prikey.P is:\n");
-                        for (i=0; i < 64; i++){
-                                printf("%02x ",pri_key.P[i]);
-                                if((i+1)%16 == 0) printf("\n");
+                        printf("\nthe prikey is:\n");
+                        for (i = 0; i < 64; i++){
+                                printf("%02x",pri_key.P[i]);
                         }
-                        printf("\nthe prikey.Q is:\n");
-                        for (i=0; i < 64; i++){
-                                printf("%02x ",pri_key.Q[i]);
-                                if((i+1)%16 == 0) printf("\n");
+                        printf("++");
+                        for (i = 0; i < 64; i++){
+                                printf("%02x",pri_key.Q[i]);
                         }
+                        printf("\n");
                         break;
                 case 'v':
                         printf("version 1.0.0\n");
